@@ -38,7 +38,7 @@ jobs:
       uses: SonarSource/sonarqube-scan-action@main
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: ${{ secret.SONAR_HOST_URL }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
     - name: SonarQube Quality Gate check
       id: sonarqube-quality-gate-check
@@ -72,7 +72,7 @@ jobs:
     - name: Push docker Image
       run: |
        docker push jackdhub/boardgame:latest
-       
+
       
       
 
