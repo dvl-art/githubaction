@@ -35,14 +35,14 @@ jobs:
         echo 'Scanning completed'
 
     - name: SonarQube Scanner
-      uses: SonarSource/sonarqube-scan-action@main
+      uses: sonarsource/sonarqube-scan-action@v2
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
     - name: SonarQube Quality Gate check
       id: sonarqube-quality-gate-check
-      uses: sonarsource/sonarqube-scan-action@v2
+      uses: sonarsource/sonarqube-quality-gate-action@master
       with:
         timeout-minutes: 5
       env:
@@ -72,7 +72,7 @@ jobs:
     - name: Push docker Image
       run: |
        docker push jackdhub/boardgame:latest
-
+       
       
       
 
