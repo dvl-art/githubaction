@@ -37,11 +37,7 @@ jobs:
      - name: Trivy Scan FileSystem
        run: |
         echo "Running Trivy FS scan for HIGH and CRITICAL vulnerabilities..."
-          trivy fs ./ \
-            --severity HIGH,CRITICAL \
-            --exit-code 1 \
-            --format table \
-            -o trivy-fs-report.html
+        trivy fs ./ --severity HIGH,CRITICAL --exit-code 1 --format table -o trivy-fs-report.html
           echo "Trivy scan completed successfully."
 
      - name: Upload Trivy FS Report
@@ -60,15 +56,12 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-  quality_check:
-   runs-on: self-hosted
-   steps:
-     - name: SonarQube Quality Gate check
-       id: sonarqube-quality-gate-check
-       uses: sonarsource/sonarqube-quality-gate-action@master
-       with:
+      - name: SonarQube Quality Gate check
+        id: sonarqube-quality-gate-check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        with:
          pollingTimeoutSec: 300
-       env:
+        env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
