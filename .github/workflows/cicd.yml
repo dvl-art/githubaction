@@ -43,21 +43,21 @@ jobs:
   code_scan:
     runs-on: self-hosted
     steps:
-    - name: SonarQube Scanner
-      uses: sonarsource/sonarqube-scan-action@v2
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      - name: SonarQube Scanner
+        uses: sonarsource/sonarqube-scan-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
   quality_check:
    runs-on: self-hosted
    steps:
-    - name: SonarQube Quality Gate check
-      id: sonarqube-quality-gate-check
-      uses: sonarsource/sonarqube-quality-gate-action@master
-      with:
-        timeout-minutes: 5
-      env:
+     - name: SonarQube Quality Gate check
+       id: sonarqube-quality-gate-check
+       uses: sonarsource/sonarqube-quality-gate-action@master
+       with:
+         timeout-minutes: 5
+       env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
@@ -65,11 +65,11 @@ jobs:
   docker_image:
     runs-on: self-hosted
     steps:
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
     # - name: Extract Version Info
     #   id: vars
@@ -86,13 +86,13 @@ jobs:
   image_scan:
    runs-on: self-hosted
    steps:
-    - name: Trivy Image Scan 
-      run: | 
-       trivy image --format table -o trivy-image-report.html jackdhub/boardgame:latest
+     - name: Trivy Image Scan 
+       run: | 
+        trivy image --format table -o trivy-image-report.html jackdhub/boardgame:latest
 
-    - name: Login to Docker Hub
-      uses: docker/login-action@v3
-      with:
+     - name: Login to Docker Hub
+       uses: docker/login-action@v3
+       with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
@@ -100,9 +100,9 @@ jobs:
   docker_push:
     runs-on: self-hosted
     steps:
-     - name: Push docker Image
-       run: |
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/boardgame:${{github.run_id}}
+      - name: Push docker Image
+        run: |
+         docker push ${{ secrets.DOCKERHUB_USERNAME }}/boardgame:${{github.run_id}}
 
 
   updatek8s:
