@@ -7,11 +7,10 @@ on:
     branches: [ "main" ]
 
 jobs:
+
   build:
-
-    runs-on: self-hosted
-
-    steps:
+   runs-on: self-hosted
+   steps:
     - name: checkout code
       uses: actions/checkout@v4
       with: ${{ secrets.REPO_TOKEN_TOKEN }}
@@ -30,19 +29,29 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Boardgame
-        path:  target/*.jar
+        path:  target/*.jar 
+          
+  fs_scan:
+    runs-on: self-hosted
 
-    - name: Trivy FS Scan
-      run: |
-        trivy fs --format  table -o trivy-fs-report.html . 
-        echo 'Scanning completed'
+    steps:
+     - name: Trivy Scan FileSystem
+       run: |
+        trivy fs scan --format table -o result.html
 
+
+  code_scan:
+    runs-on: self-hosted
+    steps:
     - name: SonarQube Scanner
       uses: sonarsource/sonarqube-scan-action@v2
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
+  quality_check:
+   runs-on: self-hosted
+   steps:
     - name: SonarQube Quality Gate check
       id: sonarqube-quality-gate-check
       uses: sonarsource/sonarqube-quality-gate-action@master
@@ -52,6 +61,10 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
+
+  docker_image:
+    runs-on: self-hosted
+    steps:
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
 
@@ -70,6 +83,9 @@ jobs:
     #    IMAGE_TAG=${{ env.build_date }}-${{ env.sha_short }}
 
 
+  image_scan:
+   runs-on: self-hosted
+   steps:
     - name: Trivy Image Scan 
       run: | 
        trivy image --format table -o trivy-image-report.html jackdhub/boardgame:latest
@@ -80,14 +96,18 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Push docker Image
-      run: |
-       docker push ${{ secrets.DOCKERHUB_USERNAME }}/boardgame:${{github.run_id}}
+
+  docker_push:
+    runs-on: self-hosted
+    steps:
+     - name: Push docker Image
+       run: |
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/boardgame:${{github.run_id}}
+
 
   updatek8s:
     runs-on: self-hosted
-
-    needs: docker
+    needs: docker_push
 
     steps:
       - name: checkout code 
